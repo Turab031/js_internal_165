@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Box</title>
+    <style>
+        .box {
+            border: 2px solid #333;
+            padding: 20px;
+            margin: 10px;
+            background-color: #f0f0f0;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="addBox()">Add Box</button>
+
+    <script>
+        let boxCount = 0;
+        
+        function addBox() {
+            boxCount++;
+            
+            // Create new div element
+            const newBox = document.createElement("div");
+            
+            // Add class for styling
+            newBox.className = "box";
+            
+            // Add text content
+            newBox.textContent = "Box " + boxCount;
+            
+            // Append to body
+            document.body.appendChild(newBox);
+        }
+    </script>
+</body>
+</html>

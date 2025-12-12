@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Size Changer</title>
+</head>
+<body>
+    <img id="myImage" src="https://picsum.photos/400/300" width="400">
+    <br>
+    <button onclick="makeSmall()">Small</button>
+    <button onclick="makeLarge()">Large</button>
+
+    <script>
+        function makeSmall() {
+            document.getElementById("myImage").setAttribute("width", "200");
+        }
+        
+        function makeLarge() {
+            document.getElementById("myImage").setAttribute("width", "600");
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Counter</title>
+</head>
+<body>
+    <button id="decreaseBtn">- Decrease</button>
+    <span id="count">0</span>
+    <button id="increaseBtn">+ Increase</button>
+
+    <script>
+        let count = 0;
+        const countElement = document.getElementById("count");
+        
+        document.getElementById("increaseBtn").addEventListener("click", function() {
+            count++;
+            countElement.textContent = count;
+        });
+        
+        document.getElementById("decreaseBtn").addEventListener("click", function() {
+            if (count > 0) {
+                count--;
+                countElement.textContent = count;
+            }
+        });
+    </script>
+</body>
+</html>

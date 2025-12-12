@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Name Form</title>
+</head>
+<body>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button onclick="printName()">Print Name</button>
+    <p id="output"></p>
+
+    <script>
+        function printName() {
+            const name = document.getElementById("nameInput").value;
+            document.getElementById("output").textContent = "Hello, " + name + "!";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Switcher</title>
+</head>
+<body>
+    <img id="myImage" src="https://picsum.photos/seed/image1/300/200" width="300">
+    <br>
+    <button id="prevBtn">Previous</button>
+    <button id="nextBtn">Next</button>
+
+    <script>
+        const images = [
+            "https://picsum.photos/seed/image1/300/200",
+            "https://picsum.photos/seed/image2/300/200"
+        ];
+        
+        let currentIndex = 0;
+        const imgElement = document.getElementById("myImage");
+        
+        document.getElementById("nextBtn").addEventListener("click", function() {
+            currentIndex = (currentIndex + 1) % images.length;
+            imgElement.src = images[currentIndex];
+        });
+        
+        document.getElementById("prevBtn").addEventListener("click", function() {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            imgElement.src = images[currentIndex];
+        });
+    </script>
+</body>
+</html>
