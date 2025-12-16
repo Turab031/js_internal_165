@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Signup</title>
 
 <style>
@@ -26,14 +27,41 @@ body{
 .card h2{
     text-align:center;
     margin-bottom:20px;
+    color: #1d2671;
+}
+
+.form-group {
+    margin-bottom: 15px;
 }
 
 .card input{
     width:100%;
     padding:12px;
-    margin-bottom:15px;
     border-radius:8px;
     border:1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border 0.3s;
+}
+
+.card input:focus {
+    outline: none;
+    border-color: #c33764;
+}
+
+.card input.error {
+    border-color: #e74c3c;
+}
+
+.card input.valid {
+    border-color: #2ecc71;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
 }
 
 .card button{
@@ -44,6 +72,17 @@ body{
     border:none;
     border-radius:8px;
     font-size:16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.card button:hover {
+    background: #a02c52;
+}
+
+.card button:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
 }
 
 .card a{
@@ -52,6 +91,44 @@ body{
     text-align:center;
     text-decoration:none;
     color:#c33764;
+    font-weight: bold;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
+
+.success-message {
+    background-color: #2ecc71;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 15px;
+    display: none;
+    font-weight: bold;
+}
+
+.password-strength {
+    margin-top: 5px;
+    font-size: 14px;
+    height: 5px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #eee;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+.strength-text {
+    font-size: 12px;
+    margin-top: 3px;
+    text-align: right;
+    color: #666;
 }
 </style>
 </head>
@@ -60,12 +137,295 @@ body{
 
 <div class="card">
     <h2>Sign Up</h2>
-    <input type="text" placeholder="Full Name">
-    <input type="email" placeholder="Email">
-    <input type="password" placeholder="Password">
-    <button>Create Account</button>
+    
+    <div class="success-message" id="successMessage">
+        Account created successfully! Redirecting...
+    </div>
+    
+    <form id="signupForm">
+        <div class="form-group">
+            <input type="text" id="fullName" placeholder="Full Name">
+            <div class="error-message" id="nameError">
+                Please enter your full name (at least 2 characters)
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <input type="email" id="email" placeholder="Email">
+            <div class="error-message" id="emailError">
+                Please enter a valid email address
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Password (min 6 characters)">
+            <div class="password-strength">
+                <div class="strength-bar" id="strengthBar"></div>
+            </div>
+            <div class="strength-text" id="strengthText"></div>
+            <div class="error-message" id="passwordError">
+                Password must be at least 6 characters with letters and numbers
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <div class="error-message" id="confirmPasswordError">
+                Passwords do not match
+            </div>
+        </div>
+        
+        <button type="submit" id="signupBtn">Create Account</button>
+    </form>
+    
     <a href="index.html">← Back to Home</a>
 </div>
+
+<script>
+// Get DOM elements
+const signupForm = document.getElementById('signupForm');
+const fullNameInput = document.getElementById('fullName');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('confirmPassword');
+const nameError = document.getElementById('nameError');
+const emailError = document.getElementById('emailError');
+const passwordError = document.getElementById('passwordError');
+const confirmPasswordError = document.getElementById('confirmPasswordError');
+const signupBtn = document.getElementById('signupBtn');
+const successMessage = document.getElementById('successMessage');
+const strengthBar = document.getElementById('strengthBar');
+const strengthText = document.getElementById('strengthText');
+
+// Validation functions
+function isValidName(name) {
+    return name.trim().length >= 2;
+}
+
+function isValidEmail(email) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+}
+
+function isValidPassword(password) {
+    // At least 6 characters with letters and numbers
+    return password.length >= 6 && /[a-zA-Z]/.test(password) && /\d/.test(password);
+}
+
+function checkPasswordStrength(password) {
+    let strength = 0;
+    let text = "Very Weak";
+    let color = "#e74c3c";
+    // Length check
+    if (password.length >= 6) strength += 25;
+    if (password.length >= 8) strength += 25;
+    
+    
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
+    if (/\d/.test(password)) strength += 15;
+    if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+    
+   
+    if (strength >= 75) {
+        text = "Strong";
+        color = "#2ecc71"; // Green
+    } else if (strength >= 50) {
+        text = "Medium";
+        color = "#f39c12"; // Orange
+    } else if (strength >= 25) {
+        text = "Weak";
+        color = "#e67e22"; // Dark orange
+    }
+    
+    return { strength, text, color };
+}
+
+function passwordsMatch(password, confirmPassword) {
+    return password === confirmPassword && password !== '';
+}
+
+
+fullNameInput.addEventListener('input', function() {
+    const name = fullNameInput.value.trim();
+    
+    if (name === '') {
+        fullNameInput.classList.remove('error', 'valid');
+        nameError.style.display = 'none';
+    } else if (isValidName(name)) {
+        fullNameInput.classList.remove('error');
+        fullNameInput.classList.add('valid');
+        nameError.style.display = 'none';
+    } else {
+        fullNameInput.classList.remove('valid');
+        fullNameInput.classList.add('error');
+        nameError.style.display = 'block';
+    }
+    
+    updateSignupButton();
+});
+
+
+emailInput.addEventListener('input', function() {
+    const email = emailInput.value.trim();
+    
+    if (email === '') {
+        emailInput.classList.remove('error', 'valid');
+        emailError.style.display = 'none';
+    } else if (isValidEmail(email)) {
+        emailInput.classList.remove('error');
+        emailInput.classList.add('valid');
+        emailError.style.display = 'none';
+    } else {
+        emailInput.classList.remove('valid');
+        emailInput.classList.add('error');
+        emailError.style.display = 'block';
+    }
+    
+    updateSignupButton();
+});
+
+
+passwordInput.addEventListener('input', function() {
+    const password = passwordInput.value;
+    
+  
+    const strength = checkPasswordStrength(password);
+    strengthBar.style.width = strength.strength + '%';
+    strengthBar.style.backgroundColor = strength.color;
+    strengthText.textContent = password ? `Strength: ${strength.text}` : '';
+    
+    if (password === '') {
+        passwordInput.classList.remove('error', 'valid');
+        passwordError.style.display = 'none';
+        strengthBar.style.width = '0%';
+        strengthText.textContent = '';
+    } else if (isValidPassword(password)) {
+        passwordInput.classList.remove('error');
+        passwordInput.classList.add('valid');
+        passwordError.style.display = 'none';
+    } else {
+        passwordInput.classList.remove('valid');
+        passwordInput.classList.add('error');
+        passwordError.style.display = 'block';
+    }
+    
+    
+    if (confirmPasswordInput.value !== '') {
+        validateConfirmPassword();
+    }
+    
+    updateSignupButton();
+});
+
+
+confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+
+function validateConfirmPassword() {
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    
+    if (confirmPassword === '') {
+        confirmPasswordInput.classList.remove('error', 'valid');
+        confirmPasswordError.style.display = 'none';
+    } else if (passwordsMatch(password, confirmPassword)) {
+        confirmPasswordInput.classList.remove('error');
+        confirmPasswordInput.classList.add('valid');
+        confirmPasswordError.style.display = 'none';
+    } else {
+        confirmPasswordInput.classList.remove('valid');
+        confirmPasswordInput.classList.add('error');
+        confirmPasswordError.style.display = 'block';
+    }
+    
+    updateSignupButton();
+}
+
+
+function updateSignupButton() {
+    const isNameValid = isValidName(fullNameInput.value.trim());
+    const isEmailValid = isValidEmail(emailInput.value.trim());
+    const isPasswordValid = isValidPassword(passwordInput.value);
+    const isConfirmPasswordValid = passwordsMatch(passwordInput.value, confirmPasswordInput.value);
+    
+    signupBtn.disabled = !(isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid);
+}
+
+
+signupForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = fullNameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+    
+  
+    let isValid = true;
+    
+    if (!isValidName(name)) {
+        fullNameInput.classList.add('error');
+        nameError.style.display = 'block';
+        isValid = false;
+    }
+    
+    if (!isValidEmail(email)) {
+        emailInput.classList.add('error');
+        emailError.style.display = 'block';
+        isValid = false;
+    }
+    
+    if (!isValidPassword(password)) {
+        passwordInput.classList.add('error');
+        passwordError.style.display = 'block';
+        isValid = false;
+    }
+    
+    if (!passwordsMatch(password, confirmPassword)) {
+        confirmPasswordInput.classList.add('error');
+        confirmPasswordError.style.display = 'block';
+        isValid = false;
+    }
+    
+    if (!isValid) return;
+    
+   
+    successMessage.style.display = 'block';
+    signupBtn.textContent = 'Creating Account...';
+    signupBtn.disabled = true;
+    
+    
+    console.log('Signup attempt with:', { name, email, password });
+    
+
+    setTimeout(() => {
+        
+        signupForm.reset();
+        fullNameInput.classList.remove('error', 'valid');
+        emailInput.classList.remove('error', 'valid');
+        passwordInput.classList.remove('error', 'valid');
+        confirmPasswordInput.classList.remove('error', 'valid');
+        nameError.style.display = 'none';
+        emailError.style.display = 'none';
+        passwordError.style.display = 'none';
+        confirmPasswordError.style.display = 'none';
+        strengthBar.style.width = '0%';
+        strengthText.textContent = '';
+        
+        
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+            signupBtn.textContent = 'Create Account';
+            updateSignupButton();
+            
+           
+            alert('Account created successfully! You would now be redirected to the login page.');
+        }, 3000);
+    }, 2000);
+});
+
+
+updateSignupButton();
+</script>
 
 </body>
 </html>
